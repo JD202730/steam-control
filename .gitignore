@@ -1,0 +1,33 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependencias y build
+node_modules
+dist
+dist-ssr
+coverage
+*.local
+*.tsbuildinfo
+
+# Variables de entorno y secretos (nunca se suben)
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel
+
+# Playwright
+test-results
+playwright-report
+
+# Editores y sistema
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+*.suo
+*.sw?
