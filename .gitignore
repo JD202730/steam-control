@@ -31,3 +31,6 @@ playwright-report
 Thumbs.db
 *.suo
 *.sw?
+
+# Configuración local de herramientas
+.claude/
