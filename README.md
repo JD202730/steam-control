@@ -4,6 +4,8 @@ Plataforma inteligente de gestión, inventario, solicitudes y mantenimiento para
 
 Una sola aplicación web para que la coordinación de una Sala STEAM controle el material, atienda las solicitudes de docentes y estudiantes, reserve las impresoras 3D y planifique su mantenimiento, con un **simulador** que acelera el tiempo para ver cómo reacciona todo el sistema.
 
+**Demo en línea: <https://steam-control.vercel.app>** (usa las [credenciales de demostración](#credenciales-de-demostración)).
+
 ![Panel de administración](docs/img/admin-panel.png)
 
 ## Qué puedes hacer
@@ -114,6 +116,18 @@ Ideas clave (detalle en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) y [docs/MOD
 ## Despliegue
 
 Es una SPA estática: `vercel.json` ya incluye la configuración para Vercel (build con `npm run build`, salida en `dist` y reescritura de rutas a `index.html`). No requiere variables de entorno ni secretos.
+
+Está publicada en <https://steam-control.vercel.app>. Para volver a desplegar tras un cambio:
+
+```bash
+npx vercel deploy --prod
+```
+
+(la primera vez pide iniciar sesión en Vercel). Para comprobar el sitio publicado con las pruebas de extremo a extremo:
+
+```bash
+E2E_BASE_URL=https://steam-control.vercel.app npm run e2e   # en PowerShell: $env:E2E_BASE_URL="..."; npm run e2e
+```
 
 ## Pendiente / ideas
 

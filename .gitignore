@@ -34,3 +34,5 @@ Thumbs.db
 
 # Configuración local de herramientas
 .claude/
+.vercel
+.env*

@@ -27,7 +27,8 @@ async function kpi(page: Page, label: string): Promise<number> {
 test.describe('acceso y permisos', () => {
   test('rechaza credenciales incorrectas y lleva a cada rol a su panel', async ({ page }) => {
     await page.goto('/')
-    await expect(page).toHaveURL(/\/login$/)
+    // La primera carga genera los datos de demostración: con dos navegadores arrancando a la vez puede tardar.
+    await expect(page).toHaveURL(/\/login$/, { timeout: 60_000 })
 
     await page.getByLabel('Correo').fill(ADMIN.email)
     await page.getByLabel('Contraseña').fill('contraseña-equivocada')

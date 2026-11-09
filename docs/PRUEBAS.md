@@ -35,7 +35,7 @@ Las pruebas de servicios usan la base de datos de verdad (no *mocks*) y un reloj
 
 - `npm run typecheck`: sin errores.
 - `npm test`: **69 pruebas** en 7 archivos, todas correctas.
-- `npm run e2e`: **10 pruebas**, todas correctas.
+- `npm run e2e`: **10 pruebas**, todas correctas, tanto contra el servidor local como contra el sitio desplegado en Vercel (`E2E_BASE_URL=https://steam-control.vercel.app`).
 - `npm run build`: compila sin errores.
 
 ## Qué no cubre
