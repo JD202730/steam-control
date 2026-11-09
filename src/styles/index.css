@@ -1,0 +1,182 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Identidad visual: "cuaderno de taller". Superficies de papel verdoso, tinta casi negra con
+ * matiz verde, un teal de marca y barra lateral oscura. Los colores de las gráficas siguen la
+ * paleta categórica validada (azul, naranja, agua, amarillo, magenta) en claro y oscuro.
+ */
+:root {
+  --bg: #f3f4ef;
+  --surface: #ffffff;
+  --surface-2: #f8f9f5;
+  --ink: #14201c;
+  --ink-2: #46544e;
+  --muted: #6f7b75;
+  --line: #e1e5dc;
+  --line-strong: #cdd3c8;
+
+  --brand: #0b6e66;
+  --brand-strong: #08524c;
+  --brand-soft: #dff1ee;
+  --brand-ink: #ffffff;
+  --accent: #e8a317;
+
+  --ok: #0a7d3c;
+  --ok-soft: #e0f3e7;
+  --warn: #8a5a00;
+  --warn-soft: #fbefcf;
+  --bad: #bd2d2d;
+  --bad-soft: #fbe3e1;
+  --info: #1c5cab;
+  --info-soft: #e1ecfa;
+
+  --side: #0f1f1b;
+  --side-ink: #c4d2cc;
+  --side-line: rgba(255, 255, 255, 0.08);
+
+  /* Gráficas */
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #eda100;
+  --s5: #e87ba4;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --tick: #6b6a64;
+  --bar-zero: #e6e9e2;
+}
+
+:root.dark {
+  --bg: #0b1210;
+  --surface: #131c18;
+  --surface-2: #18231e;
+  --ink: #e9f0ec;
+  --ink-2: #b2bfb8;
+  --muted: #8a978f;
+  --line: #243029;
+  --line-strong: #33433b;
+
+  --brand: #3fb8aa;
+  --brand-strong: #7fd8cd;
+  --brand-soft: #12332e;
+  --brand-ink: #04211e;
+
+  --ok: #4cc27f;
+  --ok-soft: #11301f;
+  --warn: #e0b04a;
+  --warn-soft: #33270c;
+  --bad: #ef7b74;
+  --bad-soft: #3a1816;
+  --info: #6da7ec;
+  --info-soft: #14263d;
+
+  --side: #09100e;
+  --side-ink: #aebdb6;
+
+  --s1: #3987e5;
+  --s2: #d95926;
+  --s3: #199e70;
+  --s4: #c98500;
+  --s5: #d55181;
+  --grid: #2c2c2a;
+  --axis: #383835;
+  --tick: #9b9a93;
+  --bar-zero: #22302a;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-ink: var(--brand-ink);
+  --color-accent: var(--accent);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-side: var(--side);
+  --color-side-ink: var(--side-ink);
+  --font-sans: 'IBM Plex Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-display: 'Bricolage Grotesque', 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  button,
+  [role='button'],
+  select {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  dialog::backdrop {
+    background: rgba(8, 16, 13, 0.55);
+    backdrop-filter: blur(2px);
+  }
+  ::selection {
+    background: var(--brand-soft);
+    color: var(--ink);
+  }
+}
+
+@layer components {
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Rayado fino que evoca el avance por capas de una impresión 3D */
+  .layers {
+    background-image: repeating-linear-gradient(
+      90deg,
+      transparent 0 5px,
+      color-mix(in srgb, var(--brand-ink) 28%, transparent) 5px 6px
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
