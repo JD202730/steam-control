@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { Search } from 'lucide-react'
-import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react'
+import type { ComponentProps, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react'
 
 export const controlCls =
   'rounded-lg border border-line-strong bg-surface px-3 text-sm text-ink placeholder:text-muted transition-colors ' +
@@ -15,13 +15,13 @@ export function Field({ label, hint, error, children, className }: { label: Reac
     <label className={clsx('block text-sm', className)}>
       <span className="mb-1 block font-medium text-ink-2">{label}</span>
       {children}
-      {hint && !error && <span className="mt-1 block text-xs text-muted">{hint}</span>}
       {error && <span className="mt-1 block text-xs text-bad">{error}</span>}
+      {hint && <span className="mt-1 block text-xs text-muted">{hint}</span>}
     </label>
   )
 }
 
-export function Input({ className, ...rest }: InputHTMLAttributes<HTMLInputElement>) {
+export function Input({ className, ...rest }: ComponentProps<'input'>) {
   return <input {...rest} className={clsx(controlCls, widthOf(className), 'h-10', className)} />
 }
 

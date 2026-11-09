@@ -2,7 +2,7 @@ import { Minus, PackageSearch, Plus, Send, ShoppingCart, Trash2 } from 'lucide-r
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { clock } from '@/core/clock/clock'
-import { dayKey } from '@/core/dates'
+import { isIsoDay, localDay } from '@/core/dates'
 import { availableOf } from '@/modules/inventory/service'
 import { ITEM_KIND_LABEL, RETURNABLE_KINDS, type ItemKind } from '@/modules/inventory/types'
 import { useById, useCategories, useItems } from '@/modules/data-hooks'
@@ -29,7 +29,7 @@ export default function CatalogPage() {
   const [kind, setKind] = useState<'all' | ItemKind>('all')
   const [cart, setCart] = useState<Record<string, number>>({})
   const [purpose, setPurpose] = useState('')
-  const [neededBy, setNeededBy] = useState(() => dayKey(clock.nowMs()))
+  const [neededBy, setNeededBy] = useState(() => localDay(clock.nowMs()))
   const [returnBy, setReturnBy] = useState('')
 
   const visible = useMemo(() => {
@@ -49,6 +49,28 @@ export default function CatalogPage() {
     .map(([itemId, qty]) => ({ itemId, qty, item: itemsById.get(itemId) }))
     .filter((l) => l.item)
   const hasLoan = lines.some((l) => RETURNABLE_KINDS.includes(l.item!.kind))
+
+  // Validación de las fechas mientras se escribe, con el motivo a la vista (nada de botones apagados sin explicación).
+  const today = localDay(clock.nowMs())
+  const neededError = !isIsoDay(neededBy)
+    ? 'Escribe una fecha completa: día, mes y año de 4 cifras.'
+    : neededBy < today
+      ? 'Esa fecha ya pasó. Elige hoy o un día posterior.'
+      : undefined
+  const returnError =
+    hasLoan && returnBy
+      ? !isIsoDay(returnBy)
+        ? 'Escribe una fecha completa (día, mes y año de 4 cifras) o quítala.'
+        : !neededError && returnBy < neededBy
+          ? 'No puede ser anterior a la fecha en que lo necesitas.'
+          : undefined
+      : undefined
+  const blocker =
+    purpose.trim().length < 5
+      ? 'Cuéntanos para qué lo necesitas (mínimo 5 letras) para poder enviarla.'
+      : neededError || returnError
+        ? 'Corrige la fecha marcada en rojo para poder enviarla.'
+        : undefined
 
   const setQty = (itemId: string, qty: number) => {
     const item = itemsById.get(itemId)
@@ -189,17 +211,30 @@ export default function CatalogPage() {
               <Field label="¿Para qué lo necesitas?">
                 <Textarea value={purpose} onChange={(e) => setPurpose(e.target.value)} placeholder="Ej.: prototipo del proyecto de robótica" maxLength={200} />
               </Field>
-              <Field label="Lo necesito el">
-                <Input type="date" min={dayKey(clock.nowMs())} value={neededBy} onChange={(e) => setNeededBy(e.target.value)} />
+              <Field label="Lo necesito el" error={neededError}>
+                <Input type="date" min={today} max="2100-12-31" value={neededBy} onChange={(e) => setNeededBy(e.target.value)} aria-invalid={!!neededError} />
               </Field>
               {hasLoan && (
-                <Field label="Devolveré las herramientas antes del" hint="Si no eliges fecha, serán 7 días después.">
-                  <Input type="date" min={neededBy} value={returnBy} onChange={(e) => setReturnBy(e.target.value)} />
+                <Field
+                  label="Devolveré las herramientas antes del (opcional)"
+                  error={returnError}
+                  hint={
+                    returnBy ? (
+                      <button type="button" className="underline hover:text-ink" onClick={() => setReturnBy('')}>
+                        Quitar la fecha (se devolverán 7 días después)
+                      </button>
+                    ) : (
+                      'Si no eliges fecha, serán 7 días después de la fecha en que lo necesitas.'
+                    )
+                  }
+                >
+                  <Input type="date" min={neededError ? today : neededBy} max="2100-12-31" value={returnBy} onChange={(e) => setReturnBy(e.target.value)} aria-invalid={!!returnError} />
                 </Field>
               )}
-              <Button variant="primary" className="w-full" loading={pending} disabled={purpose.trim().length < 5 || !neededBy} onClick={submit} icon={<Send className="size-4" />}>
+              <Button variant="primary" className="w-full" loading={pending} disabled={!!blocker} onClick={submit} icon={<Send className="size-4" />}>
                 Enviar solicitud
               </Button>
+              {blocker && <p className="text-center text-xs text-muted">{blocker}</p>}
             </CardBody>
           )}
         </Card>

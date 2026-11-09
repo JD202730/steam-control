@@ -109,6 +109,43 @@ test.describe('flujo completo de una solicitud', () => {
     await expect(page.getByRole('button', { name: /^Material entregado Sin leer Tu solicitud fue entregada/ })).toBeVisible()
   })
 
+  test('las fechas del pedido se validan con un mensaje claro y el botón explica por qué no se puede enviar', async ({ page }) => {
+    await login(page, USER)
+    await page.goto('/user/catalogo')
+    await page.getByRole('searchbox', { name: 'Buscar en el catálogo' }).fill('Cautín')
+    await page.getByRole('button', { name: 'Agregar' }).first().click()
+
+    const send = page.getByRole('button', { name: 'Enviar solicitud' })
+    await expect(send).toBeDisabled()
+    await expect(page.getByText(/Cuéntanos para qué lo necesitas/)).toBeVisible()
+    await page.getByLabel('¿Para qué lo necesitas?').fill('Práctica de soldadura')
+    await expect(send).toBeEnabled()
+
+    // Teclear encima de una fecha puede dejar un año de 6 cifras: debe avisarse, no fallar en silencio.
+    const returnField = page.getByLabel(/Devolveré las herramientas antes del/)
+    const setRaw = (value: string) =>
+      returnField.evaluate((el, v) => {
+        const input = el as HTMLInputElement
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(input, v)
+        input.dispatchEvent(new Event('input', { bubbles: true }))
+      }, value)
+
+    await setRaw('112026-11-20')
+    await expect(page.getByText(/Escribe una fecha completa/)).toBeVisible()
+    await expect(send).toBeDisabled()
+
+    await setRaw('2020-01-01') // fecha válida, pero anterior a la de "lo necesito el"
+    await expect(page.getByText('No puede ser anterior a la fecha en que lo necesitas.')).toBeVisible()
+    await expect(send).toBeDisabled()
+
+    await page.getByRole('button', { name: /Quitar la fecha/ }).click() // vuelve a "7 días después"
+    await expect(send).toBeEnabled()
+    await returnField.fill('2030-05-20')
+    await expect(send).toBeEnabled()
+    await send.click()
+    await expect(page.getByText('Solicitud enviada. Te avisaremos cuando la revisen.')).toBeVisible()
+  })
+
   test('aprobar desde el panel actualiza los indicadores al instante', async ({ page }) => {
     await login(page, ADMIN)
     await expect(page.getByRole('heading', { name: 'Panel de administración' })).toBeVisible()

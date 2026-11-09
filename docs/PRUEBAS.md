@@ -28,14 +28,15 @@ Las pruebas de servicios usan la base de datos de verdad (no *mocks*) y un reloj
 - **Impresoras**: reservas sin solapes y franjas contiguas, límites de duración y de reservas por usuario, inicio de trabajos con reserva de filamento, avance por reloj, cancelación y falla a mitad de trabajo, y mantenimiento preventivo automático por horas.
 - **Mantenimiento**: programar marca las reservas afectadas, cancelar las restaura, no se puede iniciar con la impresora imprimiendo, repuestos que descuentan stock, completar reinicia las horas, y reparación completa tras una falla.
 - **Notificaciones y alertas**: cada evento avisa a quien corresponde; las alertas aparecen y desaparecen al cambiar los datos y el reconocimiento se limpia al resolverse el problema.
+- **Fechas**: se aceptan solo fechas reales (no años de 5-6 cifras al teclear encima de otra) y el "hoy" de un pedido sigue la hora local, no la de UTC; el formulario del catálogo muestra qué fecha está mal y por qué el botón está apagado (unitarias y E2E).
 - **Persistencia**: los datos y la sesión sobreviven a recargar la página (E2E).
 - **Gráficas y alertas reaccionan**: aprobar una solicitud desde el panel cambia los indicadores al instante (E2E); las gráficas se dibujan y se pueden ver como tabla (E2E).
 
 ## Resultado de la última ejecución
 
 - `npm run typecheck`: sin errores.
-- `npm test`: **69 pruebas** en 7 archivos, todas correctas.
-- `npm run e2e`: **10 pruebas**, todas correctas, tanto contra el servidor local como contra el sitio desplegado en Vercel (`E2E_BASE_URL=https://steam-control.vercel.app`).
+- `npm test`: **72 pruebas** en 7 archivos, todas correctas.
+- `npm run e2e`: **11 pruebas**, todas correctas, tanto contra el servidor local como contra el sitio desplegado en Vercel (`E2E_BASE_URL=https://steam-control.vercel.app`).
 - `npm run build`: compila sin errores.
 - **Integración continua** (`.github/workflows/ci.yml`): en cada push a `main` y en cada pull request ejecuta lint, tipos, pruebas y build, y después las pruebas E2E en Chromium sobre Linux. La primera ejecución pasó completa.
 

@@ -1,6 +1,6 @@
 import { registerAllHandlers } from '@/app/handlers'
 import { clock } from '@/core/clock/clock'
-import { dayKey } from '@/core/dates'
+import { localDay } from '@/core/dates'
 import { db } from '@/core/db/db'
 import { bus } from '@/core/events/bus'
 import type { Actor } from '@/core/permissions/roles'
@@ -11,7 +11,7 @@ export const admin: Actor = { id: 'a1', name: 'Ada Admin', role: 'admin' }
 export const alice: Actor = { id: 'u1', name: 'Alice', role: 'user' }
 export const bob: Actor = { id: 'u2', name: 'Bob', role: 'user' }
 
-export const today = () => dayKey(clock.nowMs())
+export const today = () => localDay(clock.nowMs())
 
 /** Base de datos limpia, reloj real y manejadores de eventos registrados. */
 export async function resetDb(opts: { users?: boolean } = {}): Promise<void> {

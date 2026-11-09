@@ -121,6 +121,28 @@ describe('solicitudes', () => {
     expect(await db.requests.count()).toBe(0)
   })
 
+  it('explica qué fecha está mal cuando se teclea una inválida (p. ej. año de 6 cifras) y acepta "hoy" según la hora local', async () => {
+    const { item } = await makeWorld()
+    const tool = await item('FEC', { kind: 'tool', initialStock: 5 })
+    const line = [{ itemId: tool.id, qty: 1 }]
+    const base = { purpose: 'Prueba de fechas', neededBy: today(), lines: line }
+
+    await expect(createRequest(alice, { ...base, returnBy: '112026-11-20' })).rejects.toMatchObject({
+      code: 'VALIDATION',
+      message: expect.stringContaining('fecha de devolución'),
+    })
+    await expect(createRequest(alice, { ...base, neededBy: '' })).rejects.toMatchObject({
+      code: 'VALIDATION',
+      message: expect.stringContaining('en que lo necesitas'),
+    })
+    // Una fecha de devolución válida y posterior se acepta; "hoy" local nunca se considera pasado.
+    const ok = await createRequest(alice, { ...base, returnBy: addDaysToDay(today(), 10) })
+    expect(ok.returnBy).toBe(addDaysToDay(today(), 10))
+    // Sin fecha de devolución, el sistema pone 7 días después.
+    const dflt = await createRequest(bob, { ...base })
+    expect(dflt.returnBy).toBe(addDaysToDay(today(), 7))
+  })
+
   it('une líneas repetidas del mismo artículo y lista solo las solicitudes pedidas', async () => {
     const { item } = await makeWorld()
     const a = await item('MRG', { initialStock: 10 })

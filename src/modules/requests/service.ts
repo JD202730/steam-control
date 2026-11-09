@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { clock } from '@/core/clock/clock'
-import { addDaysToDay } from '@/core/dates'
+import { addDaysToDay, isIsoDay, localDay } from '@/core/dates'
 import { writeAudit } from '@/core/db/audit'
 import { db, INVENTORY_TABLES } from '@/core/db/db'
 import { runTx } from '@/core/db/tx'
@@ -45,7 +45,7 @@ export async function getRequest(id: string): Promise<RequestWithLines | undefin
 
 /** Solicitud entregada con devoluciones pendientes y fecha límite vencida. */
 export function isReturnOverdue(request: SupplyRequest, nowMs: number): boolean {
-  return request.status === 'delivered' && request.returnBy < new Date(nowMs).toISOString().slice(0, 10)
+  return request.status === 'delivered' && request.returnBy < localDay(nowMs)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -76,12 +76,12 @@ async function loadOrThrow(id: string): Promise<RequestWithLines> {
 /*  Escritura                                                                  */
 /* -------------------------------------------------------------------------- */
 
-const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'La fecha no es válida.')
+const dayField = (message: string) => z.string().refine(isIsoDay, message)
 
 const createSchema = z.object({
   purpose: z.string().trim().min(5, 'Describe el propósito (mín. 5 caracteres).').max(200),
-  neededBy: dateSchema,
-  returnBy: dateSchema.optional(),
+  neededBy: dayField('La fecha en que lo necesitas no es válida: revisa el día, el mes y el año.'),
+  returnBy: dayField('La fecha de devolución no es válida: revisa el día, el mes y el año, o déjala vacía.').optional(),
   lines: z
     .array(
       z.object({
@@ -98,7 +98,7 @@ export type CreateRequestInput = z.input<typeof createSchema>
 export async function createRequest(actor: Actor | null, input: CreateRequestInput): Promise<SupplyRequest> {
   assertCan(actor, 'requests:create')
   const data = parseInput(createSchema, input)
-  const today = clock.iso().slice(0, 10)
+  const today = localDay(clock.nowMs())
   if (data.neededBy < today) throw invalid('La fecha en que lo necesitas no puede estar en el pasado.')
   const returnBy = data.returnBy ?? addDaysToDay(data.neededBy, 7)
   if (returnBy < data.neededBy) throw invalid('La fecha de devolución no puede ser anterior a la fecha en que lo necesitas.')

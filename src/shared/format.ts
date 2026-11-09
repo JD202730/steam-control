@@ -31,5 +31,11 @@ export function toLocalInput(ms: number): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-/** Valor de un <input type="datetime-local"> -> ISO (UTC). */
-export const fromLocalInput = (value: string): string => new Date(value).toISOString()
+/**
+ * Valor de un <input type="datetime-local"> -> ISO (UTC). Si la fecha está incompleta o es inválida
+ * devuelve el texto tal cual, para que el servicio responda con un mensaje claro en vez de fallar aquí.
+ */
+export function fromLocalInput(value: string): string {
+  const d = new Date(value)
+  return Number.isNaN(d.getTime()) ? value : d.toISOString()
+}

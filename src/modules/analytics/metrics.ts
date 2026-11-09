@@ -1,4 +1,4 @@
-import { DAY, HOUR } from '@/core/dates'
+import { DAY, HOUR, localDay } from '@/core/dates'
 import { availableOf } from '../inventory/service'
 import type { Category, InventoryItem, ItemKind, StockMovement } from '../inventory/types'
 import { ACTIVE_MAINTENANCE_STATUSES, MAINTENANCE_TYPE_LABEL, type MaintenanceTask } from '../maintenance/types'
@@ -39,7 +39,7 @@ export interface AdminKpis {
 }
 
 export function adminKpis(s: Snapshot): AdminKpis {
-  const today = new Date(s.nowMs).toISOString().slice(0, 10)
+  const today = localDay(s.nowMs)
   const active = s.items.filter((i) => i.active)
   const printers = s.printers.filter((p) => p.active)
   const count = (status: PrinterStatus) => printers.filter((p) => p.status === status).length
@@ -55,9 +55,9 @@ export function adminKpis(s: Snapshot): AdminKpis {
     printersDown: count('error') + count('maintenance') + count('offline'),
     maintenanceOpen: s.tasks.filter((t) => ACTIVE_MAINTENANCE_STATUSES.includes(t.status)).length,
     reservationsToday: s.reservations.filter(
-      (r) => (r.status === 'confirmed' || r.status === 'in_progress') && r.startsAt.slice(0, 10) === today,
+      (r) => (r.status === 'confirmed' || r.status === 'in_progress') && localDay(r.startsAt) === today,
     ).length,
-    jobsToday: s.jobs.filter((j) => j.startedAt.slice(0, 10) === today).length,
+    jobsToday: s.jobs.filter((j) => localDay(j.startedAt) === today).length,
   }
 }
 
@@ -93,7 +93,7 @@ export function userSummary(s: Snapshot, userId: string): UserSummary {
 const dayLabel = (day: string) => `${day.slice(8, 10)}/${day.slice(5, 7)}`
 
 function lastDays(nowMs: number, days: number): string[] {
-  return Array.from({ length: days }, (_, i) => new Date(nowMs - (days - 1 - i) * DAY).toISOString().slice(0, 10))
+  return Array.from({ length: days }, (_, i) => localDay(nowMs - (days - 1 - i) * DAY))
 }
 
 const CONSUMPTION_TYPES = new Set(['issue', 'out'])
@@ -109,7 +109,7 @@ export function consumptionByDay(
     if (!CONSUMPTION_TYPES.has(m.type)) continue
     const kind = kindOf.get(m.itemId)
     if (!kind || !opts.kinds.includes(kind)) continue
-    const day = m.at.slice(0, 10)
+    const day = localDay(m.at)
     totals.set(day, (totals.get(day) ?? 0) + m.qty)
   }
   return lastDays(s.nowMs, opts.days).map((day) => ({ day, label: dayLabel(day), value: totals.get(day) ?? 0 }))

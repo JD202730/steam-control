@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { CalendarPlus } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import { HOUR, MINUTE } from '@/core/dates'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { HOUR, MINUTE, isIsoDay } from '@/core/dates'
 import type { Actor } from '@/core/permissions/roles'
 import { useAction } from '@/shared/hooks/hooks'
 import { fmtTime, toLocalInput } from '@/shared/format'
@@ -154,10 +154,23 @@ export function BookingForm({
   const [minutes, setMinutes] = useState(60)
   const [purpose, setPurpose] = useState('')
 
+  // El día puede cambiar desde fuera (flechas "día anterior/siguiente"): se refleja en el campo.
+  const dayInput = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    if (dayInput.current && isIsoDay(day) && dayInput.current.value !== day) dayInput.current.value = day
+  }, [day])
+
   const submit = async () => {
     const startsAt = new Date(`${day}T${time}`)
+    const valid = !Number.isNaN(startsAt.getTime())
     const ok = await run(
-      () => createReservation(actor, { printerId, startsAt: startsAt.toISOString(), endsAt: new Date(startsAt.getTime() + minutes * MINUTE).toISOString(), purpose }),
+      () =>
+        createReservation(actor, {
+          printerId,
+          startsAt: valid ? startsAt.toISOString() : '',
+          endsAt: valid ? new Date(startsAt.getTime() + minutes * MINUTE).toISOString() : '',
+          purpose,
+        }),
       'Reserva confirmada.',
     )
     if (ok) setPurpose('')
@@ -177,7 +190,15 @@ export function BookingForm({
           </Select>
         </Field>
         <Field label="Día">
-          <Input type="date" value={day} onChange={(e) => e.target.value && onDayChange(e.target.value)} />
+          {/* No controlado: así se puede teclear la fecha por partes sin que se borre lo escrito. */}
+          <Input
+            ref={dayInput}
+            type="date"
+            min="2000-01-01"
+            max="2100-12-31"
+            defaultValue={day}
+            onChange={(e) => isIsoDay(e.target.value) && onDayChange(e.target.value)}
+          />
         </Field>
         <Field label="Hora de inicio">
           <Input type="time" step={900} value={time} onChange={(e) => setTime(e.target.value)} />

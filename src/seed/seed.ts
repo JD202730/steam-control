@@ -1,6 +1,6 @@
 import { hashPassword } from '@/core/auth/password'
 import { clock } from '@/core/clock/clock'
-import { DAY, HOUR, MINUTE, dayKey, addDaysToDay } from '@/core/dates'
+import { DAY, HOUR, MINUTE, localDay, addDaysToDay } from '@/core/dates'
 import { db } from '@/core/db/db'
 import { errorMessage } from '@/core/errors'
 import { assertCan, type Actor } from '@/core/permissions/roles'
@@ -139,7 +139,7 @@ async function populate(): Promise<void> {
     const skus = new Set<string>(opts.skus ?? [])
     if (!opts.skus) for (let n = rng.int(1, 3); n > 0; n--) skus.add(rng.pick(REQUESTABLE))
     const lines = [...skus].map((sku) => ({ itemId: itemId.get(sku)!, qty: qtyFor(sku) }))
-    const neededBy = dayKey(createAt)
+    const neededBy = localDay(createAt)
     let reqId = ''
     add(createAt, async () => {
       const r = await createRequest(user, {
@@ -180,13 +180,13 @@ async function populate(): Promise<void> {
   requestChain(realNow - 2 * HOUR, 'u-valentina', 'pending')
   requestChain(realNow - 8 * HOUR, 'u-mateo', 'approved', { decideAfter: 90 })
   requestChain(realNow - 26 * HOUR, 'u-sofia', 'delivered', {
-    returnBy: dayKey(realNow + 2 * DAY),
+    returnBy: localDay(realNow + 2 * DAY),
     skus: ['HER-MULT', 'ELE-ARD-UNO', 'ELE-LED'],
     decideAfter: 60,
     deliverAfter: 180,
   })
   requestChain(at(9, 14), 'u-mateo', 'delivered', {
-    returnBy: addDaysToDay(dayKey(at(9, 14)), 3), // devolución vencida
+    returnBy: addDaysToDay(localDay(at(9, 14)), 3), // devolución vencida
     skus: ['HER-SOLD', 'SEG-GAF'],
     decideAfter: 120,
     deliverAfter: 240,

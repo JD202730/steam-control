@@ -1,5 +1,5 @@
 import { clock } from '@/core/clock/clock'
-import { DAY, HOUR } from '@/core/dates'
+import { DAY, HOUR, localDay } from '@/core/dates'
 import { db } from '@/core/db/db'
 import { assertCan, type Actor } from '@/core/permissions/roles'
 import { availableOf } from '../inventory/service'
@@ -32,7 +32,7 @@ export function computeAlerts(s: AlertSnapshot): Alert[] {
   const acked = new Set(s.acks.map((a) => a.key))
   const alerts: Alert[] = []
   const add = (a: Omit<Alert, 'acked'>) => alerts.push({ ...a, acked: acked.has(a.key) })
-  const today = new Date(s.nowMs).toISOString().slice(0, 10)
+  const today = localDay(s.nowMs)
 
   for (const item of s.items) {
     if (!item.active) continue

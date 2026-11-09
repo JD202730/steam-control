@@ -1,5 +1,5 @@
 import { clock } from '@/core/clock/clock'
-import { DAY, MINUTE, dayKey } from '@/core/dates'
+import { DAY, MINUTE, localDay } from '@/core/dates'
 import { db } from '@/core/db/db'
 import { invalid } from '@/core/errors'
 import { assertCan, SYSTEM_ACTOR, type Actor } from '@/core/permissions/roles'
@@ -176,7 +176,7 @@ async function createRandomRequest(rng: Rng, users: Actor[], counters: SimCounte
   try {
     await createRequest(user, {
       purpose: rng.pick(REQUEST_PURPOSES),
-      neededBy: dayKey(clock.nowMs() + rng.int(0, 2) * DAY),
+      neededBy: localDay(clock.nowMs() + rng.int(0, 2) * DAY),
       lines,
     })
     counters.requests++
