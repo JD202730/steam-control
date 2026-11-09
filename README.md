@@ -1,5 +1,7 @@
 # STEAM Control
 
+[![CI](https://github.com/JD202730/steam-control/actions/workflows/ci.yml/badge.svg)](https://github.com/JD202730/steam-control/actions/workflows/ci.yml)
+
 Plataforma inteligente de gestión, inventario, solicitudes y mantenimiento para una Sala STEAM.
 
 Una sola aplicación web para que la coordinación de una Sala STEAM controle el material, atienda las solicitudes de docentes y estudiantes, reserve las impresoras 3D y planifique su mantenimiento, con un **simulador** que acelera el tiempo para ver cómo reacciona todo el sistema.
@@ -134,4 +136,4 @@ E2E_BASE_URL=https://steam-control.vercel.app npm run e2e   # en PowerShell: $en
 - Backend real (autenticación y datos compartidos entre dispositivos).
 - Importación y exportación de inventario en CSV.
 - Calendario mensual de reservas y recordatorios por correo.
-- Integración continua con GitHub Actions (pruebas y compilación en cada commit).
+- Conectar el repositorio a Vercel para redesplegar automáticamente en cada push.
