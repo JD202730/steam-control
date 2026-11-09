@@ -119,7 +119,7 @@ Ideas clave (detalle en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) y [docs/MOD
 
 Es una SPA estática: `vercel.json` ya incluye la configuración para Vercel (build con `npm run build`, salida en `dist` y reescritura de rutas a `index.html`). No requiere variables de entorno ni secretos.
 
-Está publicada en <https://steam-control.vercel.app>. Para volver a desplegar tras un cambio:
+Está publicada en <https://steam-control.vercel.app>. El repositorio está conectado a Vercel: **cada push a `main` se despliega automáticamente**. También se puede desplegar a mano:
 
 ```bash
 npx vercel deploy --prod
@@ -136,4 +136,3 @@ E2E_BASE_URL=https://steam-control.vercel.app npm run e2e   # en PowerShell: $en
 - Backend real (autenticación y datos compartidos entre dispositivos).
 - Importación y exportación de inventario en CSV.
 - Calendario mensual de reservas y recordatorios por correo.
-- Conectar el repositorio a Vercel para redesplegar automáticamente en cada push.
