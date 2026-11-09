@@ -15,5 +15,8 @@ export async function loadSnapshot(): Promise<Snapshot> {
     db.jobs.toArray(),
     db.maintenance.toArray(),
   ])
+  // Lo más reciente primero: los paneles toman "las últimas N" directamente de estas listas.
+  requests.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  jobs.sort((a, b) => b.startedAt.localeCompare(a.startedAt))
   return { categories, items, movements, requests, lines, printers, reservations, jobs, tasks, nowMs: clock.nowMs() }
 }
